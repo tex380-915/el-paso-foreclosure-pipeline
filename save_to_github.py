@@ -8,7 +8,8 @@ async def scrape_el_paso_foreclosure_map():
     parsed_records = []
     
     async with async_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        # FIXED: Added the required 'await' keyword right here
+        browser = await p.chromium.launch(headless=True)
         context = await browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
         page = await context.new_page()
 
