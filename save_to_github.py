@@ -8,7 +8,6 @@ async def scrape_el_paso_foreclosure_map():
     parsed_records = []
     
     async with async_playwright() as p:
-        # FIXED: Added the required 'await' keyword right here
         browser = await p.chromium.launch(headless=True)
         context = await browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
         page = await context.new_page()
@@ -53,9 +52,10 @@ async def scrape_el_paso_foreclosure_map():
 
 if __name__ == "__main__":
     records = asyncio.run(scrape_el_paso_foreclosure_map())
-    if records:
-        with open("data.json", "w") as f:
-            json.dump(records, f, indent=4)
-        print(f"Successfully generated data.json with {len(records)} active notices.")
-    else:
-        print("No dynamic notice entries found today.")
+    
+    # FIXED: Always writes a file, even if it's an empty list [].
+    # This prevents the final upload step from failing.
+    with open("data.json", "w") as f:
+        json.dump(records, f, indent=4)
+        
+    print(f"Data sync complete. Generated data.json with {len(records)} entries.")
