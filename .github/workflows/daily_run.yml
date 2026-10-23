@@ -1,0 +1,37 @@
+name: Generate Daily JSON Data
+
+on:
+  schedule:
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install Dependencies
+      run: |
+        pip install playwright
+        playwright install chromium
+
+    - name: Run Scraper
+      run: python save_to_github.py
+
+    - name: Commit and Push Changes Natively
+      run: |
+        git config --global user.name "Automated Scraper"
+        git config --global user.email "scraper@://github.com"
+        git add data.json
+        git diff-index --quiet HEAD || git commit -m "Update daily El Paso notices data feed"
+        git push
+ 
